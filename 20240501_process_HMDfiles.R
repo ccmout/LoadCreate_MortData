@@ -3,6 +3,7 @@ library(readr)
 library(stringr)
 library(dplyr)
 library(tidyr)
+library(here)
 rm(list = ls())
 
 # deze parameters moeten geinitialiseerd worden vlak voordat ze gebruikt worden in de sourcecode
@@ -12,9 +13,10 @@ rm(list = ls())
 # switch_load_EuroStat <- TRUE
 # switch_merge_EuroStat_HMD <- TRUE
 
-dir_data <- file.path("C:/Users/cmout/OneDrive - Goudse/Documenten/AG-AI/Prognosetafel/AG2024/Data/EU21NL22/2024-05 C43/Input_HMD")
-dir_output_HMD <- file.path("C:/Users/cmout/OneDrive - Goudse/Documenten/AG-AI/Prognosetafel/AG2024/Data/EU21NL22/2024-05 C43/Output_HMD")
-file_list_in <-            c("AUT", "BEL", "DNK", "FIN", "FRACNP", "DEUTNP", "DEUTE", "DEUTW", "ISL", "IRL", "LUX", "NLD", "NOR", "SWE", "CHE", "GBR_NP", "GBRTENW") #land-id van bestanden in HMD
+print(paste0("de working directory is: ",here()))
+dir_data <- here("input_HMD") #    file.path("C:/Users/cmout/OneDrive - Goudse/Documenten/AG-AI/Prognosetafel/AG2024/Data/EU21NL22/2024-05 C43/Input_HMD")
+dir_output_HMD <- here("output_HMD")  #  file.path("C:/Users/cmout/OneDrive - Goudse/Documenten/AG-AI/Prognosetafel/AG2024/Data/EU21NL22/2024-05 C43/Output_HMD")
+file_list_in <- c("AUT", "BEL", "DNK", "FIN", "FRACNP", "DEUTNP", "DEUTE", "DEUTW", "ISL", "IRL", "LUX", "NLD", "NOR", "SWE", "CHE", "GBR_NP", "GBRTENW") #land-id in de HMD-data
 
 # file_list_out en EuroStat_land_list eisen herhaling van initialisatie nadat een source() is aangeroepen
 # daarom is het nodig deze initialisatie te herhalen na een source() aanroep
@@ -23,18 +25,18 @@ file_list_out <-           c("AUS", "BE" , "DNK", "FIN", "FR"    , "GEP"   , "GE
 EuroStat_land_list <-      c('AT' , 'BE' , 'DK' , 'FI' , 'FR'    , 'DE'    , 'DEE'  , 'DEW'  , 'IS' , 'IE' , 'LU' , 'NL' , 'NO' , 'SE' , 'CH' , 'GB'    , 'EW') #2-letterig land-id in EuroStat, 'EW' = Engeland + Wales is geen 2 letterige landcode
 lft_aggr_lb <- 105
 year_lb <- 1970
-year_ub <- 2019
+year_ub <- 2024
 year_DEUTE_DEUTW_merged <- 1990
 
 for (datafile in c("Deaths", "Exposures")) {
+  file <- file.path(dir_data, paste0(datafile, "_1x1.txt"))
+  temp <- readr::read_table(file, col_names = TRUE, skip = 2) %>% filter(Year >= year_lb & Year <= year_ub)
   for (i in 1:length(file_list_in)) {
-    file <- file.path(dir_data, paste0(file_list_in[i], ".", datafile,  "_1x1.txt"))
-    temp <- readr::read_table(file, col_names = TRUE, skip = 2) %>% filter(Year >= year_lb & Year <= year_ub)
     temp2 <- 
-      temp %>% filter(temp$Age %in% c(c(lft_aggr_lb:109), "110+")) %>% group_by(Year) %>% summarise(Female = sum(Female), Male = sum(Male), Total = sum(Total))
+      temp %>% filter(PopName == file_list_in[i], temp$Age %in% c(c(lft_aggr_lb:109), "110+")) %>% group_by(Year) %>% summarise(Female = sum(Female), Male = sum(Male), Total = sum(Total))
     temp2$Age <- lft_aggr_lb
     temp2 <- relocate(temp2, Age, .after = Year)
-    temp3 <- rbind(temp2, temp %>% filter(temp$Age %in% c(0:lft_aggr_lb - 1)))
+    temp3 <- rbind(temp2, temp %>% filter(PopName == file_list_in[i], temp$Age %in% c(0:lft_aggr_lb - 1)) %>% select(-PopName))
     temp3$Age <- as.integer(temp3$Age)
     temp3$Female <- format(round(temp3$Female, 2), nsmall = 2)
     temp3$Male <-format(round(temp3$Male, 2), nsmall = 2)
