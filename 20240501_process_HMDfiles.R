@@ -9,7 +9,7 @@ rm(list = ls())
 # deze parameters moeten geinitialiseerd worden vlak voordat ze gebruikt worden in de sourcecode
 # dit is nodig omdat een source() aanroep de instellingen van deze parameters verwijdert
 switch_load_CBS <- TRUE
-# switch_merge_CBS_HMD <- TRUE
+switch_merge_CBS_HMD <- TRUE
 # switch_load_EuroStat <- TRUE
 # switch_merge_EuroStat_HMD <- TRUE
 
@@ -72,7 +72,7 @@ sourcefile_CBS <- "C:/Users/cmout/OneDrive - Goudse/Documenten/AG-AI/Prognosetaf
 switch_load_CBS <- TRUE
 if(switch_load_CBS) source(sourcefile_CBS)
 
-# switch_merge_CBS_HMD <- TRUE
+switch_merge_CBS_HMD <- TRUE
 if(switch_merge_CBS_HMD) {
   dir_output <- here("output")
   dir_output_HMD <- here("output_HMD")
