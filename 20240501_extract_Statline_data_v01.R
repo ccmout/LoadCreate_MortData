@@ -2,6 +2,7 @@ library(tidyverse)
 library(jsonlite)
 library(dplyr)
 library(cbsodataR)
+library(here)
 
 # rm(list = ls())
 dir_output <- here("output_CBS") # file.path("C:/Users/cmout/OneDrive - Goudse/Documenten/AG-AI/Prognosetafel/AG2024/Data/EU21NL22/2024-05 C43/Output_CBS")
@@ -81,22 +82,31 @@ data <- cbs_add_label_columns(data)
 # data <- get_odata(targetUrl)
 # head(data)
 
-df_exp <- data %>% select(-c(1, 2, 3, 5)) %>% filter(BurgerlijkeStaat == "T001019")
-df_exp <- df_exp %>% filter(Leeftijd %in% c(10010:19905, 22300))
-df_exp <- df_exp %>% filter(Perioden %in% paste0(c(year_CBS_lb:year_CBS_ub), "JJ00"))
-df_exp$Measure <- NULL
-df_exp$BurgerlijkeStaat <- NULL
-df_exp$Geslacht <- ifelse(df_exp$Geslacht == "3000", "Male", ifelse(df_exp$Geslacht == "4000", "Female", "Total"))
+df_exp <- 
+  data %>% select(Geslacht_label, Leeftijd, BurgerlijkeStaat_label, Perioden_label, Bevolking_1) %>% 
+  filter(BurgerlijkeStaat_label == "Totaal burgerlijke staat", Leeftijd %in% c(10010:19905, 22300), Perioden_label %in% c(year_CBS_lb:year_CBS_ub))
+df_exp$Geslacht_label <- ifelse(df_exp$Geslacht_label == "Mannen", "Male", ifelse(df_exp$Geslacht_label == "Vrouwen", "Female", "Total"))
 df_exp$Leeftijd <- ifelse(df_exp$Leeftijd == 22300, 105, 
-                          ifelse(df_exp$Leeftijd == 10010, 0,
-                          (as.integer(df_exp$Leeftijd) - 10000) %/% 100 + as.integer(df_exp$Leeftijd) %% 100))
-df_exp$Perioden <- as.integer(substring(df_exp$Perioden, 1, 4))
+                            ifelse(df_exp$Leeftijd == 10010, 0,
+                                   (as.integer(df_exp$Leeftijd) - 10000) %/% 100 + as.integer(df_exp$Leeftijd) %% 100))
+df_exp$BurgerlijkeStaat_label <- NULL
+
+# df_exp <- data %>% select(-c(1, 2, 3, 5)) %>% filter(BurgerlijkeStaat == "T001019")
+# df_exp <- df_exp %>% filter(Leeftijd %in% c(10010:19905, 22300))
+# df_exp <- df_exp %>% filter(Perioden %in% paste0(c(year_CBS_lb:year_CBS_ub), "JJ00"))
+# df_exp$Measure <- NULL
+# df_exp$BurgerlijkeStaat <- NULL
+# df_exp$Geslacht <- ifelse(df_exp$Geslacht == "3000", "Male", ifelse(df_exp$Geslacht == "4000", "Female", "Total"))
+# df_exp$Leeftijd <- ifelse(df_exp$Leeftijd == 22300, 105, 
+#                           ifelse(df_exp$Leeftijd == 10010, 0,
+#                           (as.integer(df_exp$Leeftijd) - 10000) %/% 100 + as.integer(df_exp$Leeftijd) %% 100))
+# df_exp$Perioden <- as.integer(substring(df_exp$Perioden, 1, 4))
 
 df_exp$Age <- df_exp$Leeftijd
 df_exp$Leeftijd <- NULL
-df_exp$Year <- df_exp$Perioden
-df_exp$Perioden <- NULL
-df_exp <- pivot_wider(df_exp, names_from = Geslacht, values_from = Value)
+df_exp$Year <- df_exp$Perioden_label
+df_exp$Perioden_label <- NULL
+df_exp <- pivot_wider(df_exp, names_from = Geslacht_label, values_from = Bevolking_1)
 df_exp <- df_exp %>% arrange(Age, Year)
 df_exp <- df_exp %>%
   mutate(F_exposure = (Female + lead(Female, 1))/2, 
