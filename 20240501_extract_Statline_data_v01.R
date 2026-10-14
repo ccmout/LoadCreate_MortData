@@ -1,10 +1,10 @@
 library(tidyverse)
 library(jsonlite)
 
-rm(list = ls())
-dir_output <- file.path("C:/Users/cmout/OneDrive - Goudse/Documenten/AG-AI/Prognosetafel/AG2024/Data/EU21NL22/2024-05 C43/Output_CBS")
+# rm(list = ls())
+dir_output <- here("output_CBS") # file.path("C:/Users/cmout/OneDrive - Goudse/Documenten/AG-AI/Prognosetafel/AG2024/Data/EU21NL22/2024-05 C43/Output_CBS")
 year_CBS_lb <- 1995
-year_CBS_ub <- 2019
+year_CBS_ub <- 2024
 
 get_odata <- function(targetUrl) {
   data <- data.frame()
@@ -23,7 +23,9 @@ get_odata <- function(targetUrl) {
 # head(data)
 
 # tableUrl <- "https://odata4.cbs.nl/CBS/85449NED" # update verwacht 3de kwartaal 2024 (met jaar 2023); deze tabel bevat alleen de data voor tabel C, want maar 1 measure = "M000134"
-tableUrl <- "https://odata4.cbs.nl/CBS/37168"  # update verwacht 2de kwartaal 2025 (met jaar 2023 en 2024)
+# tableUrl <- "https://odata4.cbs.nl/CBS/37168"  # update verwacht 2de kwartaal 2025 (met jaar 2023 en 2024)
+# tableUrl <- "https://opendata.cbs.nl/ODataFeed/OData/37168"
+tableUrl <- "https://beta-odata4.cbs.nl/CBS/37168"
 targetUrl <- paste0(tableUrl,"/Observations")
 data <- get_odata(targetUrl)
 # head(data)

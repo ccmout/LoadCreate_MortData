@@ -14,8 +14,8 @@ rm(list = ls())
 # switch_merge_EuroStat_HMD <- TRUE
 
 print(paste0("de working directory is: ",here()))
-dir_data <- here("input_HMD") #    file.path("C:/Users/cmout/OneDrive - Goudse/Documenten/AG-AI/Prognosetafel/AG2024/Data/EU21NL22/2024-05 C43/Input_HMD")
-dir_output_HMD <- here("output_HMD")  #  file.path("C:/Users/cmout/OneDrive - Goudse/Documenten/AG-AI/Prognosetafel/AG2024/Data/EU21NL22/2024-05 C43/Output_HMD")
+dir_data <- here("input_HMD")
+dir_output_HMD <- here("output_HMD")
 file_list_in <- c("AUT", "BEL", "DNK", "FIN", "FRACNP", "DEUTNP", "DEUTE", "DEUTW", "ISL", "IRL", "LUX", "NLD", "NOR", "SWE", "CHE", "GBR_NP", "GBRTENW") #land-id in de HMD-data
 
 # file_list_out en EuroStat_land_list eisen herhaling van initialisatie nadat een source() is aangeroepen
@@ -74,9 +74,9 @@ if(switch_load_CBS) source(sourcefile_CBS)
 
 switch_merge_CBS_HMD <- TRUE
 if(switch_merge_CBS_HMD) {
-  dir_output <- file.path("C:/Users/cmout/OneDrive - Goudse/Documenten/AG-AI/Prognosetafel/AG2024/Data/EU21NL22/2024-05 C43/Output")
-  dir_output_HMD <- file.path("C:/Users/cmout/OneDrive - Goudse/Documenten/AG-AI/Prognosetafel/AG2024/Data/EU21NL22/2024-05 C43/Output_HMD")
-  dir_data_CBS <- "C:/Users/cmout/OneDrive - Goudse/Documenten/AG-AI/Prognosetafel/AG2024/Data/EU21NL22/2024-05 C43/Output_CBS"
+  dir_output <- here("output")
+  dir_output_HMD <- here("output_HMD")
+  dir_data_CBS <- here("output_CBS") # C:/Users/cmout/OneDrive - Goudse/Documenten/AG-AI/Prognosetafel/AG2024/Data/EU21NL22/2024-05 C43/Output_CBS"
   
   for (datafile in c("Deaths", "Exposures")) {
     file_HMD <- file.path(dir_output_HMD, paste0(datafile, "_NL_HMD", ".txt"))
