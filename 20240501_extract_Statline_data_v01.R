@@ -1,5 +1,7 @@
 library(tidyverse)
 library(jsonlite)
+library(dplyr)
+library(cbsodataR)
 
 # rm(list = ls())
 dir_output <- here("output_CBS") # file.path("C:/Users/cmout/OneDrive - Goudse/Documenten/AG-AI/Prognosetafel/AG2024/Data/EU21NL22/2024-05 C43/Output_CBS")
@@ -25,31 +27,42 @@ get_odata <- function(targetUrl) {
 # tableUrl <- "https://odata4.cbs.nl/CBS/85449NED" # update verwacht 3de kwartaal 2024 (met jaar 2023); deze tabel bevat alleen de data voor tabel C, want maar 1 measure = "M000134"
 # tableUrl <- "https://odata4.cbs.nl/CBS/37168"  # update verwacht 2de kwartaal 2025 (met jaar 2023 en 2024)
 # tableUrl <- "https://opendata.cbs.nl/ODataFeed/OData/37168"
-tableUrl <- "https://beta-odata4.cbs.nl/CBS/37168"
-targetUrl <- paste0(tableUrl,"/Observations")
-data <- get_odata(targetUrl)
+# tableUrl <- "https://beta-odata4.cbs.nl/CBS/37168"
+# targetUrl <- paste0(tableUrl,"/Observations")
+# data <- get_odata(targetUrl)
 # head(data)
-df_death <- data %>% select(-c(1, 3, 5)) %>% filter(BurgerlijkeStaat == "T001019")
-df_death <- df_death %>% filter(Leeftijd %in% c(10010:19905, 22300))
-df_death <- df_death %>% filter(Perioden %in% paste0(c(year_CBS_lb:year_CBS_ub), "JJ00"))
-df_death$BurgerlijkeStaat <- NULL
-df_death$Geslacht <- ifelse(df_death$Geslacht == "3000", "Male", ifelse(df_death$Geslacht == "4000", "Female", "Total"))
+data <- cbs_get_data("37168")
+data <- cbs_add_label_columns(data)
+df_death <- 
+  data %>% select(Geslacht_label, Leeftijd, BurgerlijkeStaat_label, Perioden_label, OverledenenLeeftijdBijOverlijden_1) %>% 
+    filter(BurgerlijkeStaat_label == "Totaal burgerlijke staat", Leeftijd %in% c(10010:19905, 22300), Perioden_label %in% c(year_CBS_lb:year_CBS_ub))
+df_death$Geslacht_label <- ifelse(df_death$Geslacht_label == "Mannen", "Male", ifelse(df_death$Geslacht_label == "Vrouwen", "Female", "Total"))
 df_death$Leeftijd <- ifelse(df_death$Leeftijd == 22300, 105, 
                             ifelse(df_death$Leeftijd == 10010, 0,
-                            (as.integer(df_death$Leeftijd) - 10000) %/% 100 + as.integer(df_death$Leeftijd) %% 100))
-df_death$Perioden <- as.integer(substring(df_death$Perioden, 1, 4))
+                                   (as.integer(df_death$Leeftijd) - 10000) %/% 100 + as.integer(df_death$Leeftijd) %% 100))
+df_death$BurgerlijkeStaat_label <- NULL
+# df_death <- data %>% select(-c(1, 3, 5)) %>% filter(BurgerlijkeStaat == "T001019")
+# df_death <- df_death %>% filter(Leeftijd %in% c(10010:19905, 22300))
+# df_death <- df_death %>% filter(Perioden %in% paste0(c(year_CBS_lb:year_CBS_ub), "JJ00"))
+# df_death$BurgerlijkeStaat <- NULL
+# df_death$Geslacht <- ifelse(df_death$Geslacht == "3000", "Male", ifelse(df_death$Geslacht == "4000", "Female", "Total"))
+# df_death$Leeftijd <- ifelse(df_death$Leeftijd == 22300, 105, 
+#                             ifelse(df_death$Leeftijd == 10010, 0,
+#                             (as.integer(df_death$Leeftijd) - 10000) %/% 100 + as.integer(df_death$Leeftijd) %% 100))
+# df_death$Perioden <- as.integer(substring(df_death$Perioden, 1, 4))
 
-df_death <- pivot_wider(df_death, names_from = Geslacht, values_from = Value)
+df_death <- pivot_wider(df_death, names_from = Geslacht_label, values_from = OverledenenLeeftijdBijOverlijden_1)
 df_death$Age <- df_death$Leeftijd
 df_death$Leeftijd <- NULL
-df_death$Year <- df_death$Perioden
-df_death$Perioden <- NULL
+df_death$Year <- df_death$Perioden_label
+df_death$Perioden_label <- NULL
 df_death <- relocate(df_death, Year, Age, Female, Male, .before = Total)
 df_death <- df_death %>% arrange(Year, Age)
+# df_death <- pivot_wider(df_death, names_from = Geslacht, values_from = Value)
 
-df_death_C <- df_death %>% filter(Measure == "M003614") %>% select(-c("Measure"))
-df_death_C <- df_death_C %>% arrange(Year, Age)
-df_death_C <- df_death_C %>% 
+# df_death_C <- df_death %>% filter(Measure == "M003614") %>% select(-c("Measure"))
+# df_death_C <- df_death_C %>% arrange(Year, Age)
+df_death_C <- df_death %>% 
   mutate(F_exposure = (Female - lead(Female, 1))/2, 
          M_exposure = (Male - lead(Male, 1))/2, 
          T_exposure = (Total - lead(Total, 1))/2)
@@ -57,13 +70,15 @@ df_death_C$F_exposure[df_death_C$Age == 0] <- df_death_C$Female[df_death_C$Age =
 df_death_C$M_exposure[df_death_C$Age == 0] <- df_death_C$Male[df_death_C$Age == 0] - df_death_C$Male[df_death_C$Age == 1]/2
 df_death_C$T_exposure[df_death_C$Age == 0] <- df_death_C$Total[df_death_C$Age == 0] - df_death_C$Total[df_death_C$Age == 1]/2
 
-df_death_D <- df_death %>% filter(Measure == "M003613") %>% select(-c("Measure"))
+df_death_D <- df_death
+# df_death_D <- df_death %>% filter(Measure == "M003613") %>% select(-c("Measure"))
 rm(df_death)
 
-
-tableUrl <- "https://odata4.cbs.nl/CBS/7461bev"
-targetUrl <- paste0(tableUrl,"/Observations") # update verwacht 2de kwartaal 2024 (met stand per 1 jan 2024)
-data <- get_odata(targetUrl)
+data <- cbs_get_data("7461bev")
+data <- cbs_add_label_columns(data)
+# tableUrl <- "https://odata4.cbs.nl/CBS/7461bev"
+# targetUrl <- paste0(tableUrl,"/Observations") # update verwacht 2de kwartaal 2024 (met stand per 1 jan 2024)
+# data <- get_odata(targetUrl)
 # head(data)
 
 df_exp <- data %>% select(-c(1, 2, 3, 5)) %>% filter(BurgerlijkeStaat == "T001019")
