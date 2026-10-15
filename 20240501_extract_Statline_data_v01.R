@@ -1,8 +1,9 @@
 library(tidyverse)
 library(jsonlite)
 library(dplyr)
-library(cbsodataR)
 library(here)
+# install.packages("cbsodataR")
+library(cbsodataR)
 
 # rm(list = ls())
 dir_output <- here("output_CBS") # file.path("C:/Users/cmout/OneDrive - Goudse/Documenten/AG-AI/Prognosetafel/AG2024/Data/EU21NL22/2024-05 C43/Output_CBS")

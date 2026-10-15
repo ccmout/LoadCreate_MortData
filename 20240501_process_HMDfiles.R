@@ -10,8 +10,8 @@ rm(list = ls())
 # dit is nodig omdat een source() aanroep de instellingen van deze parameters verwijdert
 switch_load_CBS <- TRUE
 switch_merge_CBS_HMD <- TRUE
-# switch_load_EuroStat <- TRUE
-# switch_merge_EuroStat_HMD <- TRUE
+switch_load_EuroStat <- TRUE
+switch_merge_EuroStat_HMD <- TRUE
 
 print(paste0("de working directory is: ",here()))
 dir_data <- here("input_HMD")
@@ -68,11 +68,11 @@ for (datafile in c("Deaths", "Exposures")) {
 
 
 # haal de CBS data op om de nog ontbrekende jaren in de HMD aan te vullen met de jaren afkomstig van het CBS 
-sourcefile_CBS <- "C:/Users/cmout/OneDrive - Goudse/Documenten/AG-AI/Prognosetafel/AG2024/Data/scripts/20240501_extract_Statline_data_v01.R"
-switch_load_CBS <- TRUE
+sourcefile_CBS <- here("20240501_extract_Statline_data_v01.R")  # "C:/Users/ccmout/Documents/AG/Prognosetafel/LoadCreate_MortData/20240501_extract_Statline_data_v01.R"
+# switch_load_CBS <- TRUE
 if(switch_load_CBS) source(sourcefile_CBS)
 
-switch_merge_CBS_HMD <- TRUE
+# switch_merge_CBS_HMD <- TRUE
 if(switch_merge_CBS_HMD) {
   dir_output <- here("output")
   dir_output_HMD <- here("output_HMD")
@@ -98,17 +98,17 @@ if(switch_merge_CBS_HMD) {
 # haal de EuroStat data op en voeg die toe aan de HMD bestanden
 # dit toevoegen hoeft niet te gebeuren voor NL, en voor UK en EW
 # mag wel, maar zal niks toevoegen aan de betreffende bestanden
-sourcefile_EuroStat <- "C:/Users/cmout/OneDrive - Goudse/Documenten/AG-AI/Prognosetafel/AG2024/Data/scripts/20240501_extract_EuroStat_allCountries_v01.R"
-switch_load_EuroStat <- TRUE
+sourcefile_EuroStat <- here("20240501_extract_EuroStat_allCountries_v01.R") # "C:/Users/ccmout/Documents/AG/Prognosetafel/LoadCreate_MortData/20240501_extract_EuroStat_allCountries_v01.R"
+# switch_load_EuroStat <- TRUE
 if(switch_load_EuroStat) source(sourcefile_EuroStat)
 
-switch_merge_EuroStat_HMD <- TRUE
+# switch_merge_EuroStat_HMD <- TRUE
 if(switch_merge_EuroStat_HMD) {
-  dir_output <- file.path("C:/Users/cmout/OneDrive - Goudse/Documenten/AG-AI/Prognosetafel/AG2024/Data/EU21NL22/2024-05 C43/Output")
-  dir_output_HMD <- file.path("C:/Users/cmout/OneDrive - Goudse/Documenten/AG-AI/Prognosetafel/AG2024/Data/EU21NL22/2024-05 C43/Output_HMD")
-  dir_data_EuroStat <- "C:/Users/cmout/OneDrive - Goudse/Documenten/AG-AI/Prognosetafel/AG2024/Data/EU21NL22/2024-05 C43/Output_EuroStat"
+  dir_output <- here("output") # file.path("C:/Users/cmout/OneDrive - Goudse/Documenten/AG-AI/Prognosetafel/AG2024/Data/EU21NL22/2024-05 C43/Output")
+  dir_output_HMD <- here("output_HMD") # file.path("C:/Users/cmout/OneDrive - Goudse/Documenten/AG-AI/Prognosetafel/AG2024/Data/EU21NL22/2024-05 C43/Output_HMD")
+  dir_data_EuroStat <- here("output_Eurostat") # "C:/Users/cmout/OneDrive - Goudse/Documenten/AG-AI/Prognosetafel/AG2024/Data/EU21NL22/2024-05 C43/Output_EuroStat"
   file_list_out <- c("AUS", "BE" , "DNK", "FIN", "FR"    , "GEP"   , "GEE"  , "GEW"  , "ICE", "IRE", "LUX", "NL" , "NOR", "SWE", "SWI", "UK"    , "EW") #land-id voor bestanden uit HMD 
-  EuroStat_land_list <-      c('AT' , 'BE' , 'DK' , 'FI' , 'FR'    , 'DE'    , 'DEE'  , 'DEW'  , 'IS' , 'IE' , 'LU' , 'NL' , 'NO' , 'SE' , 'CH' , 'GB'    , 'EW') #2-letterig land-id in EuroStat, 'EW' = Engeland + Wales is geen 2 letterige landcode
+  EuroStat_land_list <-      c('AT' , 'BE' , 'DK' , 'FI' , 'FR'    , 'DE'    , 'DEE'  , 'DEW'  , 'IS' , 'IE' , 'LU' , 'NL' , 'NO' , 'SE' , 'CH' , 'UK'    , 'EW') #2-letterig land-id in EuroStat, 'EW' = Engeland + Wales is geen 2 letterige landcode
   
   for (datafile in c("Deaths", "Exposures")) {
     for (i in 1:length(file_list_out)) {
