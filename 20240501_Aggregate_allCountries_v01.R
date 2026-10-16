@@ -5,7 +5,7 @@ library(dplyr)
 
 rm(list = ls())
 
-dir_output <- file.path("C:/Users/cmout/OneDrive - Goudse/Documenten/AG-AI/Prognosetafel/AG2024/Data/EU21NL22/2024-05 C43/Output")
+dir_output <- here("output")   # file.path("C:/Users/cmout/OneDrive - Goudse/Documenten/AG-AI/Prognosetafel/AG2024/Data/EU21NL22/2024-05 C43/Output")
 file_list_out <- c("AUS", "BE", "DNK", "FIN", "FR", "GEP", "ICE", "IRE", "LUX", "NL", "NOR", "SWE", "SWI", "UK") #landen om TOTAAL-EU te maken
 
 for (datafile in c("Deaths", "Exposures")) {

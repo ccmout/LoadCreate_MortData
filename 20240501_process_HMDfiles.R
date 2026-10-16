@@ -22,7 +22,7 @@ file_list_in <- c("AUT", "BEL", "DNK", "FIN", "FRACNP", "DEUTNP", "DEUTE", "DEUT
 # daarom is het nodig deze initialisatie te herhalen na een source() aanroep
 # file_list_out_zonder_GE <- c("AUS", "BE" , "DNK", "FIN", "FR"    ,       "GEE"  , "GEW"  , "ICE", "IRE", "LUX", "NL" , "NOR", "SWE", "SWI", "UK"    , "EW") #land-id voor bestanden uit HMD, GEE en GEW nog niet samengevoegd
 file_list_out <-           c("AUS", "BE" , "DNK", "FIN", "FR"    , "GEP"   , "GEE"  , "GEW"  , "ICE", "IRE", "LUX", "NL" , "NOR", "SWE", "SWI", "UK"    , "EW") #land-id voor bestanden uit HMD 
-EuroStat_land_list <-      c('AT' , 'BE' , 'DK' , 'FI' , 'FR'    , 'DE'    , 'DEE'  , 'DEW'  , 'IS' , 'IE' , 'LU' , 'NL' , 'NO' , 'SE' , 'CH' , 'GB'    , 'EW') #2-letterig land-id in EuroStat, 'EW' = Engeland + Wales is geen 2 letterige landcode
+# EuroStat_land_list <-      c('AT' , 'BE' , 'DK' , 'FI' , 'FR'    , 'DE'    , 'DEE'  , 'DEW'  , 'IS' , 'IE' , 'LU' , 'NL' , 'NO' , 'SE' , 'CH' , 'GB'    , 'EW') #2-letterig land-id in EuroStat, 'EW' = Engeland + Wales is geen 2 letterige landcode
 lft_aggr_lb <- 105
 year_lb <- 1970
 year_ub <- 2024
