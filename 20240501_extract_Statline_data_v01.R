@@ -65,9 +65,9 @@ df_death <- df_death %>% arrange(Year, Age)
 # df_death_C <- df_death %>% filter(Measure == "M003614") %>% select(-c("Measure"))
 # df_death_C <- df_death_C %>% arrange(Year, Age)
 df_death_C <- df_death %>% 
-  mutate(F_exposure = (Female - lead(Female, 1))/2, 
-         M_exposure = (Male - lead(Male, 1))/2, 
-         T_exposure = (Total - lead(Total, 1))/2)
+  mutate(F_exposure = (Female - lead(Female, 1, default = 0))/2, 
+         M_exposure = (Male - lead(Male, 1, default = 0))/2, 
+         T_exposure = (Total - lead(Total, 1, default = 0))/2)
 df_death_C$F_exposure[df_death_C$Age == 0] <- df_death_C$Female[df_death_C$Age == 0] - df_death_C$Female[df_death_C$Age == 1]/2
 df_death_C$M_exposure[df_death_C$Age == 0] <- df_death_C$Male[df_death_C$Age == 0] - df_death_C$Male[df_death_C$Age == 1]/2
 df_death_C$T_exposure[df_death_C$Age == 0] <- df_death_C$Total[df_death_C$Age == 0] - df_death_C$Total[df_death_C$Age == 1]/2
@@ -110,9 +110,9 @@ df_exp$Perioden_label <- NULL
 df_exp <- pivot_wider(df_exp, names_from = Geslacht_label, values_from = Bevolking_1)
 df_exp <- df_exp %>% arrange(Age, Year)
 df_exp <- df_exp %>%
-  mutate(F_exposure = (Female + lead(Female, 1))/2, 
-         M_exposure = (Male + lead(Male, 1))/2, 
-         T_exposure = (Total + lead(Total, 1))/2)
+  mutate(F_exposure = (Female + lead(Female, 1, default = 0))/2, 
+         M_exposure = (Male + lead(Male, 1, default = 0))/2, 
+         T_exposure = (Total + lead(Total, 1, default = 0))/2)
 
 df_exp <- df_exp %>% inner_join(df_death_C, by = c("Year", "Age"), suffix = c("_P", "_C"))
 df_exp$F_exposure <- df_exp$F_exposure_P + df_exp$F_exposure_C/6
